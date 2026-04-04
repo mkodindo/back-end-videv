@@ -19,6 +19,11 @@ const confirmServerIsRunning = (req, res) => {
 // Route d'accueil - Vérification que le serveur est lancé
 app.get("/", confirmServerIsRunning);
 
+// Liste tous les utilisateurs
+app.get("/users", (req, res) => {
+  res.json(users);
+});
+
 // Demarrage du serveur
 app.listen(PORT, () => {
   console.log(`Serveur à l'écoute sur http://localhost:${PORT}`);
