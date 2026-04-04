@@ -3,6 +3,12 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const users = [
+  { id: 1, nom: "Alban", age: 25, ville: "Annecy" },
+  { id: 2, nom: "Bob", age: 30, ville: "Bordeaux" },
+  { id: 3, nom: "Clémence", age: 35, ville: "Caen" },
+];
+
 const confirmServerIsRunning = (req, res) => {
   res.json({
     status: "Ok",
