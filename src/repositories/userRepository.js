@@ -1,4 +1,4 @@
-const supabase = require("../lib/supabaseClient");
+const supabase = require("../lib/supabaseAdmin");
 const errorCodes = require("../constants/errorCodes");
 
 function normalizeUser(row) {
