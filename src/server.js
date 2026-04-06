@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3456;
 const server = app.listen(PORT, () => {
   console.log(`Serveur à l'écoute sur http://localhost:${PORT}`);
   console.log(
-    "Routes : GET /  |  GET/POST /users  |  GET /users/:id  |  POST corps JSON : nom, age, ville"
+    "Routes : GET /  |  GET/POST /users  |  GET/DELETE /users/:id  |  POST JSON : nom, age, ville"
   );
 });
 

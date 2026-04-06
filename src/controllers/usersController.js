@@ -59,4 +59,17 @@ function createUser(req, res) {
   res.status(201).json(user);
 }
 
-module.exports = { getAllUsers, getUserById, createUser };
+function deleteUser(req, res) {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) {
+    return res.status(404).json({ message: "Utilisateur introuvable." });
+  }
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) {
+    return res.status(404).json({ message: "Utilisateur introuvable." });
+  }
+  users.splice(index, 1);
+  res.sendStatus(204);
+}
+
+module.exports = { getAllUsers, getUserById, createUser, deleteUser };
