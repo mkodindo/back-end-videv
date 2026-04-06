@@ -23,4 +23,40 @@ function getUserById(req, res) {
   res.json(user);
 }
 
-module.exports = { getAllUsers, getUserById };
+function createUser(req, res) {
+  const { nom, age, ville } = req.body;
+
+  if (typeof nom !== "string" || !nom.trim()) {
+    return res
+      .status(400)
+      .json({ message: "Le champ nom est requis (texte non vide)." });
+  }
+
+  const ageNum = Number(age);
+  if (!Number.isInteger(ageNum) || ageNum < 0 || ageNum > 150) {
+    return res.status(400).json({
+      message: "Le champ age doit être un entier entre 0 et 150.",
+    });
+  }
+
+  if (typeof ville !== "string" || !ville.trim()) {
+    return res
+      .status(400)
+      .json({ message: "Le champ ville est requis (texte non vide)." });
+  }
+
+  const nextId =
+    users.length === 0 ? 1 : Math.max(...users.map((u) => u.id)) + 1;
+
+  const user = {
+    id: nextId,
+    nom: nom.trim(),
+    age: ageNum,
+    ville: ville.trim(),
+  };
+
+  users.push(user);
+  res.status(201).json(user);
+}
+
+module.exports = { getAllUsers, getUserById, createUser };
