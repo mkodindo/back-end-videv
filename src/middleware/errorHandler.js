@@ -26,6 +26,17 @@ function errorHandler(err, req, res, next) {
     });
   }
 
+  if (
+    typeof err.statusCode === "number" &&
+    err.statusCode >= 400 &&
+    err.statusCode < 600
+  ) {
+    return res.status(err.statusCode).json({
+      message: err.message,
+      code: err.code || errorCodes.INTERNAL_ERROR,
+    });
+  }
+
   console.error(err);
   res.status(500).json({
     message: "Une erreur interne s'est produite.",

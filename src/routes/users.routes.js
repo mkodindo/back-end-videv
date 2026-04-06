@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const asyncHandler = require("../utils/asyncHandler");
 const {
   getAllUsers,
   getUserById,
@@ -9,10 +10,10 @@ const {
 
 const router = Router();
 
-router.get("/", getAllUsers);
-router.post("/", createUser);
-router.get("/:id", getUserById);
-router.put("/:id", updateUser);
-router.delete("/:id", deleteUser);
+router.get("/", asyncHandler(getAllUsers));
+router.post("/", asyncHandler(createUser));
+router.get("/:id", asyncHandler(getUserById));
+router.put("/:id", asyncHandler(updateUser));
+router.delete("/:id", asyncHandler(deleteUser));
 
 module.exports = router;
