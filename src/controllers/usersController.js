@@ -1,11 +1,31 @@
 const { users } = require("../data/users");
+const errorCodes = require("../constants/errorCodes");
 const { parseVillesQuery } = require("../utils/parseVillesQuery");
 
+function parseUserIdParam(rawId) {
+  const id = Number(rawId);
+  if (!Number.isInteger(id) || id < 1) {
+    return { ok: false };
+  }
+  return { ok: true, id };
+}
+
 function parseUserBody(body) {
+  if (body === null || typeof body !== "object" || Array.isArray(body)) {
+    return {
+      ok: false,
+      message:
+        "Le corps doit être un objet JSON avec les propriétés nom, age et ville.",
+    };
+  }
+
   const { nom, age, ville } = body;
 
   if (typeof nom !== "string" || !nom.trim()) {
-    return { ok: false, message: "Le champ nom est requis (texte non vide)." };
+    return {
+      ok: false,
+      message: "Le champ nom est requis et doit être un texte non vide.",
+    };
   }
 
   const ageNum = Number(age);
@@ -17,7 +37,10 @@ function parseUserBody(body) {
   }
 
   if (typeof ville !== "string" || !ville.trim()) {
-    return { ok: false, message: "Le champ ville est requis (texte non vide)." };
+    return {
+      ok: false,
+      message: "Le champ ville est requis et doit être un texte non vide.",
+    };
   }
 
   return {
@@ -39,21 +62,33 @@ function getAllUsers(req, res) {
 }
 
 function getUserById(req, res) {
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id < 1) {
-    return res.status(404).json({ message: "Utilisateur introuvable." });
+  const idResult = parseUserIdParam(req.params.id);
+  if (!idResult.ok) {
+    return res.status(400).json({
+      message:
+        "L'identifiant dans l'URL doit être un entier strictement positif (ex. 1, 2, 3).",
+      code: errorCodes.INVALID_USER_ID,
+    });
   }
-  const user = users.find((u) => u.id === id);
+
+  const user = users.find((u) => u.id === idResult.id);
   if (!user) {
-    return res.status(404).json({ message: "Utilisateur introuvable." });
+    return res.status(404).json({
+      message: "Aucun utilisateur ne correspond à cet identifiant.",
+      code: errorCodes.USER_NOT_FOUND,
+    });
   }
+
   res.json(user);
 }
 
 function createUser(req, res) {
   const parsed = parseUserBody(req.body);
   if (!parsed.ok) {
-    return res.status(400).json({ message: parsed.message });
+    return res.status(400).json({
+      message: parsed.message,
+      code: errorCodes.VALIDATION_ERROR,
+    });
   }
 
   const nextId =
@@ -71,23 +106,33 @@ function createUser(req, res) {
 }
 
 function updateUser(req, res) {
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id < 1) {
-    return res.status(404).json({ message: "Utilisateur introuvable." });
+  const idResult = parseUserIdParam(req.params.id);
+  if (!idResult.ok) {
+    return res.status(400).json({
+      message:
+        "L'identifiant dans l'URL doit être un entier strictement positif (ex. 1, 2, 3).",
+      code: errorCodes.INVALID_USER_ID,
+    });
   }
 
-  const index = users.findIndex((u) => u.id === id);
+  const index = users.findIndex((u) => u.id === idResult.id);
   if (index === -1) {
-    return res.status(404).json({ message: "Utilisateur introuvable." });
+    return res.status(404).json({
+      message: "Aucun utilisateur ne correspond à cet identifiant.",
+      code: errorCodes.USER_NOT_FOUND,
+    });
   }
 
   const parsed = parseUserBody(req.body);
   if (!parsed.ok) {
-    return res.status(400).json({ message: parsed.message });
+    return res.status(400).json({
+      message: parsed.message,
+      code: errorCodes.VALIDATION_ERROR,
+    });
   }
 
   const updated = {
-    id,
+    id: idResult.id,
     nom: parsed.nom,
     age: parsed.age,
     ville: parsed.ville,
@@ -98,14 +143,23 @@ function updateUser(req, res) {
 }
 
 function deleteUser(req, res) {
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id < 1) {
-    return res.status(404).json({ message: "Utilisateur introuvable." });
+  const idResult = parseUserIdParam(req.params.id);
+  if (!idResult.ok) {
+    return res.status(400).json({
+      message:
+        "L'identifiant dans l'URL doit être un entier strictement positif (ex. 1, 2, 3).",
+      code: errorCodes.INVALID_USER_ID,
+    });
   }
-  const index = users.findIndex((u) => u.id === id);
+
+  const index = users.findIndex((u) => u.id === idResult.id);
   if (index === -1) {
-    return res.status(404).json({ message: "Utilisateur introuvable." });
+    return res.status(404).json({
+      message: "Aucun utilisateur ne correspond à cet identifiant.",
+      code: errorCodes.USER_NOT_FOUND,
+    });
   }
+
   users.splice(index, 1);
   res.sendStatus(204);
 }
